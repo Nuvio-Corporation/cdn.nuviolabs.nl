@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Licece | Nuvio CDN</title>
+    <style>
+      :root {
+        --bg-1: #040814;
+        --bg-2: #0a1024;
+        --bg-3: #140d2d;
+        --panel: rgba(13, 22, 44, 0.75);
+        --panel-border: rgba(148, 163, 184, 0.22);
+        --text: #edf6ff;
+        --muted: #b7c9de;
+        --accent: #7dd3fc;
+        --accent-2: #c084fc;
+        --warning: #fbbf24;
+        --shadow: rgba(96, 165, 250, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: Inter, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.18), transparent 16%),
+          radial-gradient(circle at 80% 30%, rgba(168, 85, 247, 0.2), transparent 18%),
+          radial-gradient(circle at 50% 75%, rgba(14, 165, 233, 0.12), transparent 20%),
+          linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 38%, var(--bg-3) 100%);
+        color: var(--text);
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      .stars,
+      .stars::before,
+      .stars::after {
+        position: fixed;
+        inset: 0;
+        content: "";
+        background-repeat: repeat;
+        background-size: 350px 350px;
+        background-image:
+          radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.85), transparent 60%),
+          radial-gradient(1.5px 1.5px at 60% 20%, rgba(255,255,255,0.8), transparent 55%),
+          radial-gradient(2px 2px at 80% 70%, rgba(255,255,255,0.9), transparent 60%),
+          radial-gradient(1.5px 1.5px at 30% 80%, rgba(255,255,255,0.8), transparent 50%),
+          radial-gradient(2px 2px at 45% 55%, rgba(255,255,255,0.7), transparent 60%);
+        opacity: 0.8;
+        animation: twinkle 12s ease-in-out infinite alternate;
+      }
+
+      .stars::before {
+        transform: scale(1.3);
+        opacity: 0.45;
+        animation-delay: 2s;
+      }
+
+      .stars::after {
+        transform: scale(1.7);
+        opacity: 0.32;
+        animation-delay: 4s;
+      }
+
+      @keyframes twinkle {
+        0% { opacity: 0.35; }
+        50% { opacity: 0.8; }
+        100% { opacity: 0.5; }
+      }
+
+      .cosmos {
+        position: relative;
+        width: min(92vw, 940px);
+        padding: 48px 32px;
+        border-radius: 28px;
+        background: rgba(9, 14, 29, 0.66);
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.1), 0 24px 80px rgba(15, 23, 42, 0.8), 0 0 60px rgba(96, 165, 250, 0.16);
+        backdrop-filter: blur(12px);
+        overflow: hidden;
+      }
+
+      .cosmos::before {
+        content: "";
+        position: absolute;
+        inset: -30% 25% auto -18%;
+        height: 220px;
+        background: radial-gradient(circle, rgba(125, 211, 252, 0.18), transparent 60%);
+        pointer-events: none;
+      }
+
+      .label {
+        display: inline-block;
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: rgba(125, 211, 252, 0.08);
+        border: 1px solid rgba(125, 211, 252, 0.22);
+        border-radius: 999px;
+        padding: 0.65rem 0.9rem;
+        margin-bottom: 1.2rem;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.5rem, 7vw, 5.5rem);
+        line-height: 0.96;
+        letter-spacing: -0.06em;
+        font-weight: 800;
+      }
+
+      .error-code {
+        display: inline-block;
+        margin-top: 0.2rem;
+        background: linear-gradient(135deg, var(--accent-2), #de16f9 34%, #7b00cc 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 18px rgba(251, 191, 36, 0.24);
+      }
+
+      .message {
+        margin-top: 1.6rem;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        line-height: 1.7;
+      }
+
+      .message strong {
+        color: var(--text);
+      }
+
+      .path-box {
+        margin-top: 1.6rem;
+        display: inline-block;
+        width: min(100%, 740px);
+        padding: 1rem 1.2rem;
+        border-radius: 16px;
+        border: 1px solid rgba(192, 132, 252, 0.28);
+        background: rgba(13, 22, 44, 0.7);
+        color: var(--accent);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: clamp(0.84rem, 1.7vw, 1.05rem);
+        white-space: nowrap;
+        overflow: auto;
+        box-shadow: inset 0 0 20px rgba(192, 132, 252, 0.08);
+      }
+
+      .hint {
+        margin-top: 1.4rem;
+        color: #dbeafe;
+        opacity: 0.9;
+        font-size: 0.96rem;
+      }
+
+      .footer {
+        margin-top: 2rem;
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(15, 118, 110, 0.08);
+        border: 1px solid rgba(45, 212, 191, 0.18);
+        color: #ccfbf1;
+        font-size: 0.86rem;
+      }
+
+      .dot {
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 50%;
+        background: #2dd4bf;
+        box-shadow: 0 0 12px rgba(45, 212, 191, 0.9);
+      }
+
+      @media (max-width: 640px) {
+        .cosmos {
+          padding: 28px 20px;
+          border-radius: 22px;
+        }
+
+        .path-box {
+          white-space: normal;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stars" aria-hidden="true"></div>
+
+    <main class="cosmos" role="main" aria-live="polite">
+      <div class="label">Licence</div>
+      <h1>
+        CC <span class="error-code">BY-NC-ND</span> 4.0
+      </h1>
+
+      <div class="message">
+        <strong>Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License</strong>
+        <br>
+        Copyright (c) 2026 Nuvio Corporation founded by Aleksander Karpowicz-Markowski
+        <h3 style="color: var(--accent-2); font-weight: 600;">cdn.nuviolabs.nl/cdn/company/category/file.xxxx</h3>
+
+
+By exercising the Licensed Rights (defined below), You accept and agree to be bound by the terms and conditions of this Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License ("Public License"). To the extent this Public License may be interpreted as a contract, You are granted the Licensed Rights in consideration of Your acceptance of these terms and conditions, and the Licensor grants You such rights in consideration of benefits the Licensor receives from making the Licensed Material available under these terms and conditions.
+<br>
+You are free to:
+<ul>
+  <li>Share — copy and redistribute the material in any medium or format.</li>
+<br>
+Under the following terms:
+<br>
+  <li>Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.</li>
+  <li>NonCommercial: You may not use the material for commercial purposes.</li>
+  <li>NoDerivatives: If you remix, transform, or build upon the material, you may not distribute the modified material.</li>
+</ul>
+Full legal code available at: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
+
+    </div>
+      
+      <div class="footer">
+        <span class="pill"><span class="dot"></span> Licene</span>
+        <span class="pill"><span class="dot"></span> CC BY-NC-ND 4.0</span>
+      </div>
+    </main>
+  </body>
+</html>
