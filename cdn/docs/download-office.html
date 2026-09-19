@@ -1,0 +1,266 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Office Files</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f7;
+            color: #1f1f23;
+        }
+
+        .card {
+            width: min(500px, calc(100% - 32px));
+            padding: 32px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: 24px;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        button {
+            margin-top: 16px;
+            padding: 12px 20px;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #files {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .file {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #111113;
+                color: #f5f5f5;
+            }
+
+            .card {
+                background: #1c1c1f;
+                border-color: #333;
+            }
+
+            p,
+            .status {
+                color: #aaa;
+            }
+
+            .file {
+                border-color: #333;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>Download Office Files</h1>
+
+    <p>
+        Download all DOCX, XLSX and PPTX files from this directory.
+    </p>
+
+    <div id="files">
+        Searching for files...
+    </div>
+
+    <button id="downloadButton" disabled>
+        Download all files
+    </button>
+
+    <div class="status" id="status"></div>
+</div>
+
+<script>
+    const GITHUB_OWNER = "Nuvio-Corporation";
+    const GITHUB_REPO = "cdn.nuviolabs.nl";
+    const GITHUB_BRANCH = "main";
+
+    const API_BASE =
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents`;
+
+    const currentPath =
+        window.location.pathname
+            .replace(/^\/+|\/+$/g, "");
+
+    const officeExtensions = [
+        ".docx",
+        ".xlsx",
+        ".pptx"
+    ];
+
+    let filesToDownload = [];
+
+
+    async function findFiles() {
+        const apiURL = currentPath
+            ? `${API_BASE}/${currentPath}?ref=${GITHUB_BRANCH}`
+            : `${API_BASE}?ref=${GITHUB_BRANCH}`;
+
+        const response = await fetch(apiURL);
+
+        if (!response.ok) {
+            throw new Error("Could not read this directory.");
+        }
+
+        const items = await response.json();
+
+        filesToDownload = items.filter(item => {
+            if (item.type !== "file") {
+                return false;
+            }
+
+            const name = item.name.toLowerCase();
+
+            return officeExtensions.some(extension =>
+                name.endsWith(extension)
+            );
+        });
+
+        displayFiles();
+    }
+
+
+    function displayFiles() {
+        const container = document.getElementById("files");
+        const button = document.getElementById("downloadButton");
+
+        if (filesToDownload.length === 0) {
+            container.textContent =
+                "No DOCX, XLSX or PPTX files were found.";
+
+            button.disabled = true;
+            return;
+        }
+
+        container.innerHTML = filesToDownload
+            .map(file => `
+                <div class="file">
+                    ${escapeHTML(file.name)}
+                </div>
+            `)
+            .join("");
+
+        button.disabled = false;
+
+        document.getElementById("status").textContent =
+            `${filesToDownload.length} file(s) found.`;
+    }
+
+
+    async function downloadAll() {
+        if (!filesToDownload.length) {
+            return;
+        }
+
+        const status = document.getElementById("status");
+        const button = document.getElementById("downloadButton");
+
+        button.disabled = true;
+
+        for (const file of filesToDownload) {
+            status.textContent =
+                `Downloading ${file.name}...`;
+
+            const link = document.createElement("a");
+
+            link.href = file.download_url;
+            link.download = file.name;
+            link.target = "_blank";
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            // Small delay to reduce the chance of the browser
+            // blocking multiple downloads.
+            await new Promise(resolve =>
+                setTimeout(resolve, 500)
+            );
+        }
+
+        status.textContent =
+            `Finished downloading ${filesToDownload.length} file(s).`;
+
+        button.disabled = false;
+    }
+
+
+    function escapeHTML(value) {
+        return value
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    document
+        .getElementById("downloadButton")
+        .addEventListener("click", downloadAll);
+
+
+    findFiles().catch(error => {
+        document.getElementById("files").textContent =
+            error.message;
+
+        document.getElementById("status").textContent =
+            "Unable to load directory.";
+    });
+</script>
+
+</body>
+</html>
+```
